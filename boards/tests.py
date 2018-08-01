@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from .views import home, board_topic, new_topic
+from .views import home, board_topics, new_topic
 from pprint import pprint
 from .models import Board
 # Create your tests here.
@@ -54,7 +54,7 @@ class BoardTopicsTests(TestCase):
     # ensures that typing '/boards/1' after domain will resolve to the 
     # board_topics function in boards/views.py
     def test_board_topics_url_resolves_board_topics_view(self):
-        view = resolve('/boards/1')
+        view = resolve('/boards/1/')
         self.assertEqual(view.func, board_topics)
 
     # ensures the topics page has a link back to the homepage
