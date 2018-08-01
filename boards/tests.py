@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from .views import home, board_topics
+from .views import home, board_topic, new_topic
 from pprint import pprint
 from .models import Board
 # Create your tests here.
@@ -61,3 +61,23 @@ class BoardTopicsTests(TestCase):
     def test_board_topics_view_contains_link_to_home_page(self):
         home_page_url = reverse('home')
         self.assertContains(self.response, 'href="{0}"'.format(home_page_url))
+
+class NewTopicTests(TestCase):
+    def setUp(self):
+        board = Board.objects.create(name="Django", description="Django Board")
+    
+    def test_new_topic_view_status_code(self):
+        pass
+
+    # ensure the new_topic page for pk = 99 returns a 404 page
+    def test_new_topic_view_not_found_status_code(self):
+        pass
+
+    # ensures that typing '/boards/1/new' after domain will resolve to the 
+    # new_topic function in boards/views.py
+    def test_new_topic_url_resolves_new_topic_view(self):
+        pass
+
+    # ensures the topics page has a link back to the homepage
+    def test_new_topic_view_contains_link_to_home_page(self):
+        pass
