@@ -166,10 +166,3 @@ class NewTopicTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(form.errors)
 
-
-
-
-
-
-from django.contrib.auth.views import LoginView
-
