@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load widget_tweaks %}
+
 
 {% block title %}
     New Topic
@@ -7,19 +9,38 @@
 
 
 {% block breadcrumbs %}
-<li class="breadcrumb-item">
-    <a href="{% url 'home' %}">Boards</a>
-</li>
-<li class="breadcrumb-item">
-    <a href="{% url 'board_topics' board.pk %}">{{ board.name }}</a>
-</li>
+<li class="breadcrumb-item"><a href="{% url 'home' %}">Boards</a></li>
+<li class="breadcrumb-item"><a href="{% url 'board_topics' board.pk %}">{{ board.name }}</a></li>
 <li class="breadcrumb-item active">New Topic</li>
 
 {% endblock  %}
 
 
 {% block content %}
-<form method="POST" id="new-topic-form" class="form-new-topic"action="">
+<!-- NEW Django Forms API form-->
+<form action="" method="post" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="form-group">
+          {{ field.label_tag }}
+
+          {% render_field field class="form-control"%}
+
+          {% if field.help_text %}
+            <small class="form-text text-muted">
+                {{ field.help_text}}
+            </small> 
+          {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success px-4">Post</button>
+</form>
+{% endblock %}
+
+
+<!-- OLD FORM 
+    <form method="POST" id="new-topic-form" class="form-new-topic"action="">
     {% csrf_token %}
     <div class="form-group">
         <label for="subject">Subject</label>
@@ -31,5 +52,6 @@
     </div>
     <button type="submit" class="btn btn-success">Post</button>
 </form>
-{% endblock %}
+--> 
+
     
