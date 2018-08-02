@@ -19,7 +19,8 @@
 
 
 {% block content %}
-<form id="new-topic-form" class="form-new-topic"action="">
+<form method="POST" id="new-topic-form" class="form-new-topic"action="">
+    {% csrf_token %}
     <div class="form-group">
         <label for="subject">Subject</label>
         <input name="subject" class="form-control" id="subject" type="text" placeholder="Subject of New Topic">

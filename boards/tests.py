@@ -58,9 +58,12 @@ class BoardTopicsTests(TestCase):
         self.assertEqual(view.func, board_topics)
 
     # ensures the topics page has a link back to the homepage
-    def test_board_topics_view_contains_link_to_home_page(self):
+    def test_board_topics_view_contains_navigation_links(self):
         home_page_url = reverse('home')
+        new_topic_url = reverse('new_topic', kwargs={"pk": self.board.pk})
+
         self.assertContains(self.response, 'href="{0}"'.format(home_page_url))
+        self.assertContains(self.response, 'href="{0}"'.format(new_topic_url))
 
 class NewTopicTests(TestCase):
     def setUp(self):

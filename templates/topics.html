@@ -15,10 +15,11 @@
     
 
 {% block content %}
-
-<a href="{% url 'new_topic' board.pk %}">
-    <button class="btn btn-primary">New Topic</button>
-</a>
+<div class="mb-4">
+    <a href="{% url 'new_topic' board.pk %}">
+        <button class="btn btn-primary">New Topic</button>
+    </a>
+</div>
 <table class="table">
     <thead class="thead-dark">
         <th>Topic</th>
@@ -30,11 +31,11 @@
     <tbody>
         {% for topic in board.topics.all %}
         <tr>
-            <td>{{ topics.subject }}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{ topic.subject }}</td>
+            <td>{{ topic.starter.username }}</td>
+            <td>0</td>
+            <td>0</td>
+            <td>{{ topic.last_updated }}</td>
         </tr>
           
         {% endfor %}
