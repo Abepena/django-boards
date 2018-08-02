@@ -1,0 +1,36 @@
+{% load widget_tweaks %}
+
+{% for field in form %}
+<div class="form-group">
+    {{ field.label_tag }}
+    
+    <!-- IF THE FORM HAS DATA BOUND TO IT CHECK FOR ERRORS-->
+    {% if form.is_bound %}
+        <!-- GENERATE FIELD AS RED AND DISPLAY ERRORS -->
+        {% if field.errors %}
+            {% render_field field class="form-control is-invalid"%}
+            {% for error in field.errors %}
+                <div class="invalid-feedback">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        
+        <!-- OTHERWISE GENERATE THE FORM FIELD AS GREEN -->
+        {% else %}
+            {% render_field field class="form-control is-valid" %}
+        {% endif %}
+    
+    <!-- IF THE FORM DOESNT HAVE DATA BOUND TO IT RENDER FIELDS WITHOUT HIGHLIGHTING-->
+    {% else %}
+        {% render_field field class="form-control" %}
+    {% endif %}
+
+    <!-- STYLE FOR HELP_TEXT IF ANY-->
+    {% if field.help_text %}
+    <small class="form-text text-muted">
+        {{ field.help_text}}
+    </small> 
+    {% endif %}
+    </div>
+{% endfor %}
+<button type="submit" class="btn btn-success px-4">Post</button>
