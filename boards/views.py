@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .models import Board, Topic, Post
+from .forms import NewTopicForm
 # Create your views here.
 
 
@@ -17,27 +18,24 @@ def board_topics(request, pk):
 
 def new_topic(request, pk):
     board = get_object_or_404(Board, pk=pk)
+    user = User.objects.first() # TODO: get the currently logged in user
     
     # naive implementation of view 
     # not taking into account empty fields or subjects that are too large
     if request.method == "POST":
-        subject = request.POST["subject"]
-        message = request.POST["message"]
+        form = NewTopicForm(request.POST)
+        if form.is_valid():
+            topic = form.save(commit=False)
+            topic.board = board
+            topic.starter = user
+            topic.save()
+            post = Post.objects.create(
+                message = form.cleaned_data.get("message"),
+                topic=topic,
+                created_by=user,
+            )
 
-        user = User.objects.first()  # TODO: get the currently logged in user
-
-        topic = Topic.objects.create(
-            subject=subject,
-            board=board,
-            starter=user,  # TODO: get the currently logged in user
-        )
-
-        post = Post.objects.create(
-            message=message,
-            topic=topic,
-            created_by=user,
-        )
-
-        return redirect("board_topics", pk=board.pk)
-
-    return render(request, "new_topic.html", {"board": board})
+        return redirect("board_topics", pk=board.pk) #TODO: redirect to created topic detail page
+    else:
+        form = NewTopicForm()
+    return render(request, "new_topic.html", {"board": board, "form": form})
