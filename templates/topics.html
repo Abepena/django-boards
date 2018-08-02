@@ -19,5 +19,27 @@
 <a href="{% url 'new_topic' board.pk %}">
     <button class="btn btn-primary">New Topic</button>
 </a>
+<table class="table">
+    <thead class="thead-dark">
+        <th>Topic</th>
+        <th>Starter</th>
+        <th>Replies</th>
+        <th>Views</th>
+        <th>Last Update</th>
+    </thead>
+    <tbody>
+        {% for topic in board.topics.all %}
+        <tr>
+            <td>{{ topics.subject }}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+          
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock  %}
     
