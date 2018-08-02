@@ -1,8 +1,9 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse, resolve
 from .views import home, board_topics, new_topic
 from pprint import pprint
-from .models import Board
+from .models import Board, Topic, Post
 # Create your tests here.
 
 
@@ -67,30 +68,60 @@ class BoardTopicsTests(TestCase):
 
 class NewTopicTests(TestCase):
     def setUp(self):
-        self.board = Board.objects.create(name="Django", description="Django Board")
-        url = reverse("new_topic", kwargs={"pk": self.board.pk})
-        self.response = self.client.get(url)
+        Board.objects.create(name="Django", description="Django Board")
+        User.objects.create(username="john", email="johndoe@example.come")
     
-    def test_new_topic_view_status_code(self):
-        self.assertEqual(self.response.status_code, 200)
-
-    # ensure the new_topic page for pk = 99 returns a 404 page
-    def test_new_topic_view_not_found_status_code(self):
-        url = reverse("new_topic", kwargs={"pk": 99})
+    #make sure theres a csrf token on the page
+    def test_csrf(self):
+        url = reverse('new_topic', kwargs={"pk": 1})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "csrfmiddlewaretoken")
     
-    # ensures that typing '/boards/1/new' after domain will resolve to the 
-    # new_topic function in boards/views.py
-    def test_new_topic_url_resolves_new_topic_view(self):
-        view = resolve('/boards/1/new/')
-        self.assertEqual(view.func, new_topic)
+    
+    def test_new_topic_valid_post_data(self):
+        """
+        Test that posting invalid data with self.client.post 
+        does not create a new topic and post 
+        """        
+        url = reverse("new_topic", kwargs={"pk": 1})
+        data = {
+            "subject": "Test Topic",
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        }
+        response = self.client.post(url, data=data)
+        self.assertTrue(Topic.objects.exists())
+        self.assertTrue(Post.objects.exists())
 
-    # ensures the topics page has a link back to the homepage
-    def test_new_topic_view_contains_link_to_board_topics(self):
-        board_topics_url = reverse("board_topics", kwargs={"pk": self.board.pk})
-        self.assertContains(self.response, 'href="{0}"'.format(board_topics_url))
-    
-    def test_new_topic_view_contains_link_to_home_page(self):
-        home_url = reverse("home")
-        self.assertContains(self.response, 'href="{0}"'.format(home_url))
+
+    def test_new_topic_invalid_post_data_empty_fields(self):
+        """
+        Invalid post data should not redirect
+        The response should show the form again
+        """
+        url = reverse("new_topic", kwargs={"pk": 1})
+        response = self.client.post(url, data={})
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_new_topic_invalid_post_data_empty_fields(self):
+        """
+        Invalid post data should not redirect
+        The response should show the form again due to empty fields
+        Topic and Post should not have been created
+        """
+        url = reverse("new_topic", kwargs={"pk": 1})
+        data = {
+            "subject": "",
+            "message": "",
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Topic.objects.exists())
+        self.assertFalse(Post.objects.exists())
+
+
+
+
+
+
+
