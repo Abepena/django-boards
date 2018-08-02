@@ -20,8 +20,7 @@ def new_topic(request, pk):
     board = get_object_or_404(Board, pk=pk)
     user = User.objects.first() # TODO: get the currently logged in user
     
-    # naive implementation of view 
-    # not taking into account empty fields or subjects that are too large
+    # Django Forms API implementation of the New Topic Form
     if request.method == "POST":
         form = NewTopicForm(request.POST)
         if form.is_valid():
@@ -35,7 +34,7 @@ def new_topic(request, pk):
                 created_by=user,
             )
 
-        return redirect("board_topics", pk=board.pk) #TODO: redirect to created topic detail page
+            return redirect("board_topics", pk=board.pk) #TODO: redirect to created topic detail page
     else:
         form = NewTopicForm()
     return render(request, "new_topic.html", {"board": board, "form": form})

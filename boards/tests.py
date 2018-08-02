@@ -71,6 +71,35 @@ class NewTopicTests(TestCase):
         Board.objects.create(name="Django", description="Django Board")
         User.objects.create(username="john", email="johndoe@example.come")
     
+    def test_new_topic_view_status_code(self):
+        url = reverse("new_topic", kwargs={"pk": 1})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    # ensure the new_topic page for pk = 99 returns a 404 page
+    def test_new_topic_view_not_found_status_code(self):
+        url = reverse("new_topic", kwargs={"pk": 99})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+    
+    # ensures that typing '/boards/1/new' after domain will resolve to the 
+    # new_topic function in boards/views.py
+    def test_new_topic_url_resolves_new_topic_view(self):
+        view = resolve('/boards/1/new/')
+        self.assertEqual(view.func, new_topic)
+
+    # ensures the topics page has a link back to the homepage
+    def test_new_topic_view_contains_link_to_board_topics(self):
+        url = reverse("new_topic", kwargs={"pk": 1})
+        board_topics_url = reverse("board_topics", kwargs={"pk": 1})
+        response = self.client.get(url)
+        self.assertContains(response, 'href="{0}"'.format(board_topics_url))
+    
+    def test_new_topic_view_contains_link_to_home_page(self):
+        home_url = reverse("home")
+        response = self.client.get(home_url)
+        self.assertContains(response, 'href="{0}"'.format(home_url))
+    
     #make sure theres a csrf token on the page
     def test_csrf(self):
         url = reverse('new_topic', kwargs={"pk": 1})
