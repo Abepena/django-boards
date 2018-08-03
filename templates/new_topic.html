@@ -21,6 +21,7 @@
 <form action="" method="post" novalidate>
     {% csrf_token %}
     {% include "includes/form.html" %}
+    <input type="submit" value="POST" class="btn btn-success">
 </form>
 {% endblock %}
 
