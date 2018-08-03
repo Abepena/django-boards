@@ -5,19 +5,21 @@
     <div class="col-lg-8 col-md-10">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title text-center">Sign Up</h3>
-                <form action="" method="POST" class="form-group">
+                <h3 class="card-title text-center">Login</h3>
+                <form action="" method="POST" class="form-group" novalidate>
                     {% csrf_token %}
                     {% include "includes/form.html" %}
-                    <input type="submit" class="btn btn-primary" value="Create an Account">
+                    <input type="submit" class="btn btn-primary" value="Login">
                 </form>
             </div>
             <div class="card-footer text-muted text-center">
-                Already have an account?
-                <a href="">Login</a>
+                Don't have an account?
+                <a href="{% url 'signup' %}">Sign up</a>
             </div>
         </div>
     </div>
 </div>
 {% endblock  %}
+
+
     

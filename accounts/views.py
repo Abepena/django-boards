@@ -1,6 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import SignUpForm
+
 # Create your views here.
 def signup(request):
     if request.method == "POST":
