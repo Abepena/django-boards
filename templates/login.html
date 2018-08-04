@@ -8,6 +8,7 @@
                 <h3 class="card-title text-center">Login</h3>
                 <form action="" method="POST" class="form-group" novalidate>
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
                     {% include "includes/form.html" %}
                     <input type="submit" class="btn btn-primary" value="Login">
                 </form>

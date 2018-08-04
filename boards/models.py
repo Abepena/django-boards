@@ -14,6 +14,7 @@ class Board(models.Model):
 
 class Topic(models.Model):
     """
+    Model for Topic instance within a board
     related_name is optional, Django will auto-generate the related name as
     <class_name>_set if nothing is specified
     ex. Topic --> related_name = topic_set by default unless otherwise specified
@@ -29,6 +30,7 @@ class Topic(models.Model):
 
 class Post(models.Model):
     """
+    Model for Post instance within a Topic
     The updated_by attribute has a related_name of '+', this just tells Django 
     that we dont need this reverse relationship so it will ignore it
 
