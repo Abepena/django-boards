@@ -13,8 +13,12 @@
                 </form>
             </div>
             <div class="card-footer text-muted text-center">
-                Don't have an account?
+                <small>Don't have an account?
                 <a href="{% url 'signup' %}">Sign up</a>
+                </small><br>
+                <small class="my-0">Forgot your password?
+                <a href="{% url 'password_reset' %}">Reset Password</a>
+                </small>
             </div>
         </div>
     </div>
