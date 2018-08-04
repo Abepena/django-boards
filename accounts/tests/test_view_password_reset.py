@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import PasswordResetView, PasswordResetCompleteView
 from django.contrib.auth.forms import PasswordResetForm
 from django.core import mail
 from django.contrib.auth.models import User
@@ -70,5 +70,15 @@ class InvalidPasswordResetTests(TestCase):
         self.assertEqual(0, len(mail.outbox)) 
 
     
-
+class PasswordResetCompleteTests(TestCase):
+    def setUp(self):
+        url = reverse('password_reset_complete')
+        self.response= self.client.get(url)
     
+    def test_status_code(self):
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_view_function(self):
+        view = resolve('/reset/complete/')
+        self.assertEqual(view.func.view_class, PasswordResetCompleteView)
+
