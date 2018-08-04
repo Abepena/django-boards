@@ -1,5 +1,5 @@
 from django import forms
-from .models import Topic
+from .models import Topic, Post
 
 class NewTopicForm(forms.ModelForm):
     """
@@ -23,3 +23,14 @@ class NewTopicForm(forms.ModelForm):
         # The subject field refers to the subject field in the Topic 
         # model and message will refer to the message later cleaned and created in a Post object
         fields = ['subject', 'message']
+
+class PostForm(forms.ModelForm):
+    message = forms.CharField(
+        widget = forms.Textarea(
+            attrs={"rows": 5,"placeholder": "Reply Message"}
+        ),
+        help_text="max length: 4000 characters"
+    )
+    class Meta:
+        model = Post
+        fields = ['message', ]
