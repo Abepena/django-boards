@@ -35,21 +35,56 @@ def create_board(request):
     return render(request, "create_board.html", {"form": form})
 
 
+class TopicsListView(ListView):
+    model = Topic
+    context_object_name = 'topics'
+    template_name = 'topics.html'
+    paginate_by = 20 #adds paginator similar to FBV below
 
-def board_topics(request, pk):
-    board = get_object_or_404(Board, pk=pk)
-    queryset = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
-    page = request.GET.get('page', 1)
+    def get_queryset(self):
+        self.board = get_object_or_404(Board, pk=self.kwargs.get('pk'))
+        queryset = self.board.topics.order_by('-last_updated').annotate(
+            replies=Count('posts')-1
+        )
+        return queryset
 
-    paginator = Paginator(queryset, 20)
+    def get_context_data(self, **kwargs):
+        """ 
+        add board to context objects kwargs 
+        with the ListView model specified as Topic and topics as the 
+        context_object_name, the only thing passed into the context is `topics`
 
-    try:
-        topics = paginator.page(page)
-    except PageNotAnInteger:
-        topics = paginator.page(1)
-    except EmptyPage:
-        topics = paginator.page(paginator.num_pages)
-    return render(request, "topics.html", {"board": board, "topics": topics})
+        This method passes another kwarg `board` to the context when rendering
+        the page similar to the FBV so that the template will have all the 
+        necessary variables to render the page as we intended.
+
+        The code below will pass `board` to the context_data of the render func
+        ex. render(request, 'topics.html', {"board": self.board, "topics": topics})
+        """
+        kwargs['board'] = self.board 
+        return super().get_context_data(**kwargs)
+    
+
+    
+
+
+
+
+#Side by side refactored FBV to Generic CBV ListView 
+# def board_topics(request, pk):
+#     board = get_object_or_404(Board, pk=pk)
+#     queryset = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+#     page = request.GET.get('page', 1)
+
+#     paginator = Paginator(queryset, 20)
+
+#     try:
+#         topics = paginator.page(page)
+#     except PageNotAnInteger:
+#         topics = paginator.page(1)
+#     except EmptyPage:
+#         topics = paginator.page(paginator.num_pages)
+#     return render(request, "topics.html", {"board": board, "topics": topics})
 
 @login_required
 def new_topic(request, pk):
