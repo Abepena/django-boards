@@ -41,6 +41,23 @@
         {% endfor %}
     </tbody>
 </table>
+{% if topics.has_other_pages %}
+<nav class="mb-4">
+    <ul class="pagination">
+        {% if topics.has_previous %}
+        <li class="page-item">
+            <a href="?page={{ topics.previous_page_number }}" class="page-link">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+        </li> 
+        {% endif %}
+        
+    </ul>
+</nav>
+  
+{% endif %}
 
 {% endblock  %}
     

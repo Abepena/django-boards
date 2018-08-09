@@ -5,15 +5,22 @@ from .models import Board, Topic, Post
 from .forms import BoardForm, NewTopicForm, PostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from django.views.generic import View, UpdateView
+from django.views.generic import View, UpdateView, ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 
 
-def home(request):
-    boards = Board.objects.all()
-    return render(request, "home.html", {"boards": boards})
+class BoardListView(ListView):
+    model = Board
+    context_object_name = "boards"
+    template_name = 'home.html'
+
+# Side by side refactored FBV to Generic CBV List view
+# def home(request):
+    # boards = Board.objects.all()
+    # return render(request, "home.html", {"boards": boards})
 
 @login_required
 def create_board(request):
@@ -31,7 +38,17 @@ def create_board(request):
 
 def board_topics(request, pk):
     board = get_object_or_404(Board, pk=pk)
-    topics = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    queryset = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(queryset, 20)
+
+    try:
+        topics = paginator.page(page)
+    except PageNotAnInteger:
+        topics = paginator.page(1)
+    except EmptyPage:
+        topics = paginator.page(paginator.num_pages)
     return render(request, "topics.html", {"board": board, "topics": topics})
 
 @login_required
@@ -92,7 +109,7 @@ class PostUpdateView(UpdateView):
     originally created the post, the Post queryset will come up empty
     """
     def get_queryset(self):
-        queryset= super().get_queryset()
+        queryset = super().get_queryset()
         return queryset.filter(created_by=self.request.user)
 
     def form_valid(self, form):
