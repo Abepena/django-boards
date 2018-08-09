@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from ..models import Board
-from ..views import board_topics
+from ..views import TopicsListView
 
 class BoardTopicsTests(TestCase):
     # Set up a temp board, and a response that can be reached from other methods
@@ -28,7 +28,7 @@ class BoardTopicsTests(TestCase):
     # board_topics function in boards/views.py
     def test_board_topics_url_resolves_board_topics_view(self):
         view = resolve('/boards/1/')
-        self.assertEqual(view.func, board_topics)
+        self.assertEqual(view.func.view_class, TopicsListView)
 
     # ensures the topics page has a link back to the homepage
     def test_board_topics_view_contains_navigation_links(self):
