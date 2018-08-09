@@ -1,9 +1,24 @@
 from django import forms
-from .models import Topic, Post
+from .models import Board, Topic, Post
+
+class BoardForm(forms.ModelForm):
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Enter the name of your new board"}),
+        max_length=50,
+        help_text="Max length: 50"
+    )
+    description = forms.CharField(
+        widget=forms.TextInput(attrs={"placholder": "Brief description of your board"}),
+        max_length=80,
+    )
+
+    class Meta:
+        model = Board
+        fields = ["name", "description"]
 
 class NewTopicForm(forms.ModelForm):
     """
-    This will eventually replace the naive implementation of the
+    This will replaces the naive implementation of the
     new_topic form using the Django Forms API
     """
     # message to be cleaned and later passed into a Post object

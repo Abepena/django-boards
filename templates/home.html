@@ -3,11 +3,11 @@
 {% block title %} Boards {% endblock %} 
 
 {% block breadcrumbs %}
-<li class="breadcrumb-item active">Boards</li>
+<li class="breadcrumb-item active mb-0">Boards</li>
 {% endblock %} 
 
 {% block content %}
-
+<a href="{% url 'create_board' %}" class="btn btn-success mb-2">Create Board</a>
 <table class="table" border="1">
     <thead class="thead-dark">
         <tr>
@@ -25,9 +25,24 @@
                 <br>
                 <small class="text-muted d-block" style="color: #888">{{ board.description }}</small>
             </td>
-            <td class='align-middle'>0</td>
-            <td class="align-middle">0</td>
-            <td></td>
+            <td class='align-middle'>{{ board.get_posts_count }}</td>
+            <td class="align-middle">{{ board.get_topics_count }}</td>
+            {% with post=board.get_last_post %}
+            <td>
+            {% if post %}
+                <a href="{% url 'topic_posts' board.pk post.topic.pk %}">
+                    <small>
+                        By {{post.created_by}} on {{ post.created_at_pretty }}
+                    </small>
+                </a>         
+            {% else %}
+                <small class="text-muted">
+                    <em> No posts yet</em>
+                </small>
+            {% endif %}
+            </td>
+
+            {% endwith %}
         </tr>
         {% endfor %}
     </tbody>
