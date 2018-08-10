@@ -1,15 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from .models import Board, Topic, Post
-from .forms import BoardForm, NewTopicForm, PostForm
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
-from django.views.generic import View, UpdateView, ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.db.models import Count
+from django.views.generic import View, UpdateView, ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-# Create your views here.
+from django.urls import reverse_lazy
+
+from .forms import BoardForm, NewTopicForm, PostForm
+from .models import Board, Topic, Post
 
 
 class BoardListView(ListView):
@@ -63,12 +63,6 @@ class TopicsListView(ListView):
         """
         kwargs['board'] = self.board 
         return super().get_context_data(**kwargs)
-    
-
-    
-
-
-
 
 #Side by side refactored FBV to Generic CBV ListView 
 # def board_topics(request, pk):
@@ -85,6 +79,7 @@ class TopicsListView(ListView):
 #     except EmptyPage:
 #         topics = paginator.page(paginator.num_pages)
 #     return render(request, "topics.html", {"board": board, "topics": topics})
+
 
 @login_required
 def new_topic(request, pk):
@@ -108,12 +103,41 @@ def new_topic(request, pk):
         form = NewTopicForm()
     return render(request, "new_topic.html", {"board": board, "form": form})
 
-def topic_posts(request, board_pk, topic_pk):
-    #Note the double underscore for foreignkey pk's
-    topic = get_object_or_404(Topic, board__pk=board_pk, pk=topic_pk)
-    topic.views += 1
-    topic.save()
-    return render(request, 'topic_posts.html', {"topic":topic})
+class PostsListView(ListView):
+    model = Post
+    context_object_name = 'posts'
+    template_name = 'topic_posts.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        self.topic = get_object_or_404(
+            Topic, 
+            board__pk=self.kwargs.get('board_pk'),
+            pk=self.kwargs.get('topic_pk')
+        )
+        queryset = self.topic.posts.order_by('created_at')
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        """
+        We want our context = {"topic": topic, "posts": posts }
+        everytime we get the context data we increase the viewcount by 1 
+        """
+
+        session_key = 'viewed_topic_{}'.format(self.topic.pk)
+        if not self.request.session.get(session_key, False):
+            self.topic.views += 1
+            self.topic.save()
+            self.request.session[session_key] = True
+        kwargs['topic'] = self.topic
+        return super().get_context_data(**kwargs)
+
+# def topic_posts(request, board_pk, topic_pk):
+#     #Note the double underscore for foreignkey pk's
+#     topic = get_object_or_404(Topic, board__pk=board_pk, pk=topic_pk)
+#     topic.views += 1
+#     topic.save()
+#     return render(request, 'topic_posts.html', {"topic":topic})
 
 @login_required
 def reply_topic(request, board_pk, topic_pk):
@@ -125,6 +149,10 @@ def reply_topic(request, board_pk, topic_pk):
             post.topic = topic
             post.created_by = request.user
             post.save()
+
+            topic.last_updated = timezone.now()
+            topic.save()
+
             return redirect("topic_posts", board_pk=board_pk, topic_pk=topic_pk)
     else:
         form = PostForm()
@@ -150,5 +178,6 @@ class PostUpdateView(UpdateView):
     def form_valid(self, form):
         post = form.save(commit=False)
         post.updated_by = self.request.user
-        post.updates_at = timezone.now()
+        post.updated_at = timezone.now()
+        post.save()
         return redirect('topic_posts', board_pk=post.topic.board.pk, topic_pk=post.topic.pk)

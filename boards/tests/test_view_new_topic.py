@@ -9,11 +9,12 @@ from ..forms import NewTopicForm
 
 class NewTopicTests(TestCase):
     def setUp(self):
-        Board.objects.create(name="Django", description="Django Board")
-        User.objects.create_user(username="john", email="johndoe@example.come", password="django123")
+        Board.objects.create(name='Django', description='Django Board')
+        User.objects.create_user(username="john", email="johndoe@example.com", password="django123")
         self.client.login(username='john', password='django123')
     
     def test_new_topic_view_status_code(self):
+        print(Board.objects.get(pk=1))
         url = reverse("new_topic", kwargs={"pk": 1})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

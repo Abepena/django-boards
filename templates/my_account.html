@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+  My Account
+{% endblock  %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">My Account</li>
+{% endblock  %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8, col-sm-10">
+        <div class="card shadow">
+            <div class="card-body">
+                <form class="mt-2" action="" novalidate method="post">
+                    {% csrf_token %}
+                    {% include "includes/form.html" %}
+                    <button type="submit" class="btn btn-success">
+                       Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock  %}
